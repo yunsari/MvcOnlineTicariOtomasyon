@@ -1,0 +1,98 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/AdminLayout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+
+<br /><br />
+
+<button class="btn btn-outline-info" id="btn1">Bana Tıkla</button>
+<button class="btn btn-outline-warning" id="btn2">Bana Tıkla</button>
+<button class="btn btn-outline-success" id="btn3">Bana Tıkla</button>
+
+<script>
+    $('#btn1').click(function () {
+        Swal.fire({
+            title: 'Renk ve Arkaplan İle Oynanabiliyor.',
+            width: 600,
+            padding: '3em',
+            color: '#716add',
+            background: '#fff url(/Image/trees.png)',
+            backdrop: `
+    rgba(0,0,123,0.4)
+    url("/Image/nyan-cat.gif")
+    left top
+    no-repeat
+  `
+        })
+    });
+</script>
+
+<script>
+    $('#btn2').click(function () {
+        let timerInterval
+        Swal.fire({
+            title: 'Otomatik Kapanan Alert!',
+            html: 'Ben <b></b> Milisaniye İçinde Kapancam.',
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                }, 100)
+            },
+            willClose: () => {
+                clearInterval(timerInterval)
+            }
+        }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log('Zamanlayıcı Tarafından Kapatıldım UwU.')
+            }
+        })
+    });
+
+</script>
+
+<script>
+    $('#btn3').click(function () {
+        Swal.fire({
+            title: 'GitHub Kullanıcı Adı Gir!',
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Bi Bak',
+            cancelButtonText: 'İptal',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                return fetch(`//api.github.com/users/${login}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json()
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(
+                            `Öyle Bi GitHub Kullanıcısı Yok: ${error}`
+                        )
+                    })
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: `${result.value.login} kullanıcısının avatarı`,
+                    imageUrl: result.value.avatar_url
+                })
+            }
+        })
+    });
+</script>
